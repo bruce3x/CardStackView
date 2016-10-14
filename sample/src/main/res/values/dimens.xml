@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="card_height">160dp</dimen>
+    <dimen name="card_span">80dp</dimen>
+    <dimen name="card_span_min">30dp</dimen>
+</resources>
