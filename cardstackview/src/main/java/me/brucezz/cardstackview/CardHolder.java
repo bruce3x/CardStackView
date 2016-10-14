@@ -85,7 +85,7 @@ public class CardHolder {
         final int start = this.mView.getTop();
         final int end = getFixedTop();
 
-        Log.d(TAG, String.format("reset: View %s reset to %d", this.mView.getTag(), this.mRealIndex));
+        //Log.d(TAG, String.format("reset: View %s reset to %d", this.mView.getTag(), this.mRealIndex));
 
         mRunningAnimator = ValueAnimator.ofFloat(0f, 1f).setDuration(mOptions.CARD_RESET_DURATION);
         mRunningAnimator.addUpdateListener(new AnimatorUpdateListenerImpl(this, null, start, end, end));
@@ -97,7 +97,7 @@ public class CardHolder {
      */
     private void checkIfAnimatorRunning() {
         if (isAnimating()) {
-            Log.w(TAG, String.format("checkIfAnimatorRunning: card #%d is animating!", mRealIndex));
+            //Log.w(TAG, String.format("checkIfAnimatorRunning: card #%d is animating!", mRealIndex));
             mRunningAnimator.cancel();
         }
     }
@@ -157,7 +157,7 @@ public class CardHolder {
 
         mDrawOrderUpdated = false;
 
-        Log.d(TAG, "onSwap: start=" + start + ", mid=" + mid + ", end=" + end);
+        //Log.d(TAG, "onSwap: start=" + start + ", mid=" + mid + ", end=" + end);
         mRunningAnimator = ValueAnimator.ofFloat(0f, 1f);
         mRunningAnimator.setDuration(mOptions.CARD_SWAP_DURATION);
         mRunningAnimator.addUpdateListener(new AnimatorUpdateListenerImpl(this, dragging, start, mid, end));

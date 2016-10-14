@@ -64,7 +64,7 @@ public class CardStackView extends ViewGroup {
         mCardFactory = new CardFactory(mOptions);
         mCardFactory.init(this);
         mSlidingResistanceCalculator = new SlidingResistanceCalculator(2000f, mOptions.CARD_SPAN_OFFSET);
-        Log.d(TAG, "init: " + mCardAdapter.getItemCount());
+        //Log.d(TAG, "init: " + mCardAdapter.getItemCount());
     }
 
     private void initTouchCallback() {
@@ -151,7 +151,7 @@ public class CardStackView extends ViewGroup {
 
             @Override
             public void onLongPress(MotionEvent e) {
-                Log.d(TAG, String.format("onLongPress: %f, %f", e.getX(), e.getY()));
+                //Log.d(TAG, String.format("onLongPress: %f, %f", e.getX(), e.getY()));
                 mSelected = mCardFactory.findByTouch(e.getY() - getPaddingTop());
                 if (mSelected != null) {
                     mSelected.onSelect();
