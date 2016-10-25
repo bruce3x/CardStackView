@@ -23,6 +23,6 @@ Add it in your root build.gradle at the end of repositories:
 
 ```groovy
 	dependencies {
-	        compile 'com.github.brucezz:CardStackView:1.0'
+	        compile 'com.github.brucezz:CardStackView:1.2'
 	}
 ```
