@@ -2,6 +2,8 @@ package me.brucezz.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import java.util.Arrays;
@@ -38,5 +40,28 @@ public class MainActivity extends AppCompatActivity {
 
         return Arrays.asList(new Card(0xFF2196F3, R.drawable.post, "动态"), new Card(0xFF17B084, R.drawable.task, "任务"),
             new Card(0xFFE85D72, R.drawable.calendar, "日程"), new Card(0xFF00BACF, R.drawable.knowledge, "知识"));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(1, 1, 1, "修改数据");
+        menu.add(1, 2, 1, "重置");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 1:
+                for (Card card : mCards) {
+                    card.mTitle += "X";
+                }
+                mCardAdapter.notifyDataSetChanged();
+                break;
+            case 2:
+                recreate();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

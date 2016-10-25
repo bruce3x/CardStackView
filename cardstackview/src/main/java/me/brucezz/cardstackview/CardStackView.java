@@ -2,10 +2,10 @@ package me.brucezz.cardstackview;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +20,8 @@ import android.view.animation.OvershootInterpolator;
 
 public class CardStackView extends ViewGroup {
     private static final String TAG = "CardStackView";
+
+    private final DataSetObserver mObserver = new CardStackViewDataObserver();
 
     private CardFactory mCardFactory;
     private Options mOptions;
@@ -55,7 +57,7 @@ public class CardStackView extends ViewGroup {
 
     private void initViews() {
         for (int i = 0; i < mCardAdapter.getItemCount(); i++) {
-            addView(mCardAdapter.getView(i, this));
+            addView(mCardAdapter.getView(null, i, this));
         }
         mOptions = new Options();
 
@@ -271,8 +273,13 @@ public class CardStackView extends ViewGroup {
     }
 
     public void setAdapter(CardAdapter adapter) {
+        if (mCardAdapter != null) {
+            mCardAdapter.unregisterDataSetObserver(mObserver);
+        }
+
         this.mCardAdapter = adapter;
         if (mCardAdapter != null && mCardAdapter.getItemCount() > 0) {
+            mCardAdapter.registerDataSetObserver(mObserver);
             initViews();
         }
     }
@@ -306,5 +313,23 @@ public class CardStackView extends ViewGroup {
          * @param initialIndex 初始化时 View 的位置
          */
         void onClick(View view, int realIndex, int initialIndex);
+    }
+
+    private class CardStackViewDataObserver extends DataSetObserver {
+        @Override
+        public void onChanged() {
+            for (int i = 0; i < mCardFactory.size(); i++) {
+                CardHolder holder = mCardFactory.get(i);
+                holder.mView = mCardAdapter.getView(holder.mView, holder.mChildIndex, CardStackView.this);
+            }
+        }
+
+        @Override
+        public void onInvalidated() {
+            for (int i = 0; i < mCardFactory.size(); i++) {
+                CardHolder holder = mCardFactory.get(i);
+                holder.mView.postInvalidate();
+            }
+        }
     }
 }

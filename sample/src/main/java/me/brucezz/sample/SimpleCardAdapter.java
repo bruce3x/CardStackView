@@ -28,19 +28,30 @@ public class SimpleCardAdapter extends CardAdapter {
     }
 
     @Override
-    public View getView(int position, ViewGroup parent) {
+    public View getView(View oldView, int position, ViewGroup parent) {
         Card card = mCards.get(position);
-        View view = LayoutInflater.from(mContext).inflate(R.layout.item_card, parent, false);
-        CardView cardView = (CardView) view.findViewById(R.id.card);
-        TextView title = (TextView) view.findViewById(R.id.card_title);
-        ImageView image = (ImageView) view.findViewById(R.id.card_image);
 
-        title.setText(card.mTitle);
-        image.setImageResource(card.mImage);
+        ViewHolder holder;
+        View view;
+        if (oldView != null && oldView.getTag() instanceof ViewHolder) {
+            holder = (ViewHolder) oldView.getTag();
+            view = oldView;
+        } else {
+            holder = new ViewHolder();
+            view = LayoutInflater.from(mContext).inflate(R.layout.item_card, parent, false);
+            holder.mCardView = (CardView) view.findViewById(R.id.card);
+            holder.mTextView = (TextView) view.findViewById(R.id.card_title);
+            holder.mImageView = (ImageView) view.findViewById(R.id.card_image);
+        }
+
+        holder.mTextView.setText(card.mTitle);
+        holder.mImageView.setImageResource(card.mImage);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // BugFix: 4.x 版本: CardView 中填充 ImageView 会有白边
-            cardView.setCardBackgroundColor(card.mBgColor);
+            holder.mCardView.setCardBackgroundColor(card.mBgColor);
         }
+        view.setTag(holder);
+
         return view;
     }
 
@@ -57,5 +68,11 @@ public class SimpleCardAdapter extends CardAdapter {
     @Override
     public int getMinCardSpan() {
         return mContext.getResources().getDimensionPixelSize(R.dimen.card_span_min);
+    }
+
+    private static class ViewHolder {
+        CardView mCardView;
+        TextView mTextView;
+        ImageView mImageView;
     }
 }
