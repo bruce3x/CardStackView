@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
+import java.util.List;
 
 /**
  * Created by brucezz on 2016-10-08.
@@ -30,7 +31,8 @@ public class CardStackView extends ViewGroup {
 
     private ViewDragHelper mViewDragHelper;
     private GestureDetectorCompat mGestureDetector;
-    private onCardClickListener mOnCardClickListener;
+    private OnCardClickListener mOnCardClickListener;
+    private OnPositionChangedListener mOnPositionChangedListener;
     /**
      * 阻力滑动计算
      */
@@ -126,6 +128,9 @@ public class CardStackView extends ViewGroup {
                     mCardFactory.findByRealIndex(holder.mRealIndex + directionFlag).onSwap(holder);
 
                     mCardFactory.swapRealIndex(holder.mRealIndex, holder.mRealIndex + directionFlag);
+                    if (mOnPositionChangedListener != null) {
+                        mOnPositionChangedListener.onPositionChanged(mCardFactory.getAllPosition());
+                    }
                 }
             }
         };
@@ -284,8 +289,12 @@ public class CardStackView extends ViewGroup {
         }
     }
 
-    public void setOnCardClickListener(onCardClickListener listener) {
+    public void setOnCardClickListener(OnCardClickListener listener) {
         this.mOnCardClickListener = listener;
+    }
+
+    public void setOnPositionChangedListener(OnPositionChangedListener onPositionChangedListener) {
+        mOnPositionChangedListener = onPositionChangedListener;
     }
 
     /**
@@ -305,7 +314,7 @@ public class CardStackView extends ViewGroup {
         spanResetAnimator.start();
     }
 
-    public interface onCardClickListener {
+    public interface OnCardClickListener {
 
         /**
          * @param view         被点击的 View
@@ -314,6 +323,13 @@ public class CardStackView extends ViewGroup {
          */
         void onClick(View view, int realIndex, int initialIndex);
     }
+
+    public interface OnPositionChangedListener {
+        void onPositionChanged(List<Integer> position);
+    }
+
+
+
 
     private class CardStackViewDataObserver extends DataSetObserver {
         @Override

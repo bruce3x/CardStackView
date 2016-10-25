@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by brucezz on 2016-10-12.
@@ -84,5 +85,14 @@ public class CardFactory {
         Collections.swap(mCardHolders, one, another);
         mCardHolders.get(one).mRealIndex = one;
         mCardHolders.get(another).mRealIndex = another;
+    }
+
+    public List<Integer> getAllPosition() {
+        List<Integer> all = new ArrayList<>();
+        for (CardHolder holder : mCardHolders) {
+            all.add(holder.mChildIndex);
+        }
+
+        return all;
     }
 }
