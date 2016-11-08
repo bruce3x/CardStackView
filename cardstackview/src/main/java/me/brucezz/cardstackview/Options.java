@@ -8,10 +8,6 @@ package me.brucezz.cardstackview;
 
 public class Options {
     /**
-     * 屏幕宽度，跟计算 Card 宽度有关
-     */
-    public int SCREEN_WIDTH;
-    /**
      * 卡片当前绘制的间距
      */
     public int CARD_SPAN_CURRENT;
@@ -68,11 +64,18 @@ public class Options {
      * 卡片间距重置动画时长
      */
     public long SPAN_RESET_DURATION = 300L;
+    /**
+     * 点击卡片之后移除其他卡片
+     */
+    public boolean CLICK_TO_SEPARATE = true;
+    /**
+     * 移出屏幕的动画时长
+     */
+    public long CARD_SLIP_OUT = 500L;
 
     @Override
     public String toString() {
         return "Options{" +
-            "\nSCREEN_WIDTH=" + SCREEN_WIDTH +
             ", \nCARD_SPAN_CURRENT=" + CARD_SPAN_CURRENT +
             ", \nCARD_SPAN_NORMAL=" + CARD_SPAN_NORMAL +
             ", \nCARD_SPAN_NORMAL_MIN=" + CARD_SPAN_NORMAL_MIN +

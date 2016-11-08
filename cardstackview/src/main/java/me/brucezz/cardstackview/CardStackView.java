@@ -58,16 +58,17 @@ public class CardStackView extends ViewGroup {
     }
 
     private void initViews() {
+        mOptions = new Options();
+
         for (int i = 0; i < mCardAdapter.getItemCount(); i++) {
             addView(mCardAdapter.getView(null, i, this));
         }
-        mOptions = new Options();
+
+        mSlidingResistanceCalculator = new SlidingResistanceCalculator(2000f, mOptions.CARD_SPAN_OFFSET);
 
         updateOptions();
 
-        mCardFactory = new CardFactory(mOptions);
-        mCardFactory.init(this);
-        mSlidingResistanceCalculator = new SlidingResistanceCalculator(2000f, mOptions.CARD_SPAN_OFFSET);
+        mCardFactory = new CardFactory(this, mOptions);
         //Log.d(TAG, "init: " + mCardAdapter.getItemCount());
     }
 
@@ -169,7 +170,7 @@ public class CardStackView extends ViewGroup {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
 
-                CardHolder touch = mCardFactory.findByTouch(e.getY() - getPaddingTop());
+                final CardHolder touch = mCardFactory.findByTouch(e.getY() - getPaddingTop());
                 if (touch != null && mOnCardClickListener != null) {
                     mOnCardClickListener.onClick(touch.mView, touch.mRealIndex, touch.mChildIndex);
                 }
@@ -183,12 +184,14 @@ public class CardStackView extends ViewGroup {
      * 计算一些常量值
      */
     private void updateOptions() {
-        mOptions.SCREEN_WIDTH = Util.getScreenWidthPixel(getContext());
+        int parentH = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+        int parentW = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+
+        // TODO: 2016/10/31 后面提供相关属性，不通过 adapter 提供
         mOptions.CARD_HEIGHT = mCardAdapter.getCardHeight();
-        mOptions.CARD_WIDTH = mOptions.SCREEN_WIDTH - getPaddingLeft() - getPaddingRight();
+        mOptions.CARD_WIDTH = parentW;
 
         mOptions.CARD_SPAN_NORMAL_MIN = mCardAdapter.getMinCardSpan();
-        int parentH = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
         int span = (parentH - mOptions.CARD_HEIGHT) / (mCardAdapter.getItemCount() - 1);
         mOptions.CARD_SPAN_NORMAL = Math.max(span, mOptions.CARD_SPAN_NORMAL_MIN);
 
@@ -241,7 +244,7 @@ public class CardStackView extends ViewGroup {
             // wrap_content  use min span
             if (existsValidChild()) {
                 width = maxWidth;
-                height = mOptions.CARD_SPAN_NORMAL_MIN * (mCardFactory.size() - 1) + mOptions.CARD_HEIGHT;
+                height = mOptions.CARD_SPAN_NORMAL_MIN * (getChildCount() - 1) + mOptions.CARD_HEIGHT;
             }
             width += (getPaddingLeft() + getPaddingRight());
             height += (getPaddingTop() + getPaddingBottom());
@@ -269,11 +272,14 @@ public class CardStackView extends ViewGroup {
     /**
      * 更新卡片位置
      */
-    private void updateCardPosition() {
+    public void updateCardPosition() {
         if (!existsValidChild()) return;
 
         for (int i = 0; i < mCardFactory.size(); i++) {
-            mCardFactory.get(i).layoutFixed();
+            CardHolder holder = mCardFactory.get(i);
+            //if (!holder.isAnimating()) {
+                holder.layoutFixed();
+            //}
         }
     }
 
@@ -327,9 +333,6 @@ public class CardStackView extends ViewGroup {
     public interface OnPositionChangedListener {
         void onPositionChanged(List<Integer> position);
     }
-
-
-
 
     private class CardStackViewDataObserver extends DataSetObserver {
         @Override

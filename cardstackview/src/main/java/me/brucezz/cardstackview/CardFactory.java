@@ -18,12 +18,8 @@ public class CardFactory {
 
     private Options mOptions;
 
-    public CardFactory(Options options) {
+    public CardFactory(ViewGroup parent, Options options) {
         mOptions = options;
-    }
-
-    public void init(ViewGroup parent) {
-        mCardHolders.clear();
         for (int i = 0; i < parent.getChildCount(); i++) {
             mCardHolders.add(new CardHolder(parent, parent.getChildAt(i), i, mOptions));
         }
@@ -68,12 +64,12 @@ public class CardFactory {
         if (mCardHolders.size() == 0) return null;
 
         int index;
-        int last = mCardHolders.size() - 1;
-        CardHolder lastHolder = mCardHolders.get(last);
-        if (touchY > lastHolder.getFixedBottom()) {
+        int count = mCardHolders.size() - 1;
+        int span = count * mOptions.CARD_SPAN_CURRENT;
+        if (touchY > span + mOptions.CARD_HEIGHT) {
             return null;
-        } else if (touchY > last * mOptions.CARD_SPAN_CURRENT) {
-            index = last;
+        } else if (touchY > span) {
+            index = count;
         } else {
             index = (int) Math.floor(touchY / mOptions.CARD_SPAN_CURRENT);
         }

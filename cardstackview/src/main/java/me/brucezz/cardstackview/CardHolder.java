@@ -1,7 +1,6 @@
 package me.brucezz.cardstackview;
 
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
@@ -58,7 +57,7 @@ public class CardHolder {
     }
 
     public int getFixedRight() {
-        return mParent.getWidth() - mParent.getPaddingRight();
+        return getFixedLeft() + mView.getMeasuredWidth();
     }
 
     public int getFixedTop() {
@@ -169,7 +168,7 @@ public class CardHolder {
     /**
      * 判断是否在执行动画
      */
-    private boolean isAnimating() {
+    public boolean isAnimating() {
         return mRunningAnimator != null && mRunningAnimator.isRunning();
     }
 
