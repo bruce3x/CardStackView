@@ -40,6 +40,12 @@ public class CardStackView extends ViewGroup {
 
     private CardHolder mSelected;
 
+    private boolean mSkipLayout = false;
+
+    public void setSkipLayout(boolean skipLayout) {
+        mSkipLayout = skipLayout;
+    }
+
     public CardStackView(Context context) {
         this(context, null);
     }
@@ -266,6 +272,7 @@ public class CardStackView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (mSkipLayout) return;
         updateCardPosition();
     }
 
@@ -277,9 +284,9 @@ public class CardStackView extends ViewGroup {
 
         for (int i = 0; i < mCardFactory.size(); i++) {
             CardHolder holder = mCardFactory.get(i);
-            //if (!holder.isAnimating()) {
+            if (!holder.isAnimating()) {
                 holder.layoutFixed();
-            //}
+            }
         }
     }
 
