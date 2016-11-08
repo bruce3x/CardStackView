@@ -150,6 +150,15 @@ public class MainActivity extends AppCompatActivity {
         public int startBottom;
         public int endBottom;
 
+        public int startPaddingLeft;
+        public int endPaddingLeft;
+        public int startPaddingRight;
+        public int endPaddingRight;
+        public int startPaddingTop;
+        public int endPaddingTop;
+        public int startPaddingBottom;
+        public int endPaddingBottom;
+
         public float startRadius;
         public float endRadius;
 
@@ -157,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         public @ColorInt int endColor;
         private ArgbEvaluator mArgbEvaluator = new ArgbEvaluator();
 
-        public static final long ANIMATION_DURATION_CARD = 5000L;
+        public static final long ANIMATION_DURATION_CARD = 500L;
         public static final long ANIMATION_DURATION_ALPHA = 300L;
 
         public AnimationHelper(View view, int index) {
@@ -171,10 +180,17 @@ public class MainActivity extends AppCompatActivity {
             startTop = mCardView.getTop();
             startBottom = mCardView.getBottom();
 
-            endLeft = 0;
-            endRight = mCardView.getWidth() + 2 * mCardView.getLeft();
-            endTop = 0;
-            endBottom = mCardView.getHeight();
+            endLeft = -mCardView.getPaddingLeft();
+            endRight = mCardView.getWidth() + 2 * mCardView.getLeft() + mCardView.getPaddingRight();
+            endTop = -mCardView.getPaddingTop();
+            endBottom = mCardView.getHeight() - mCardView.getPaddingTop();
+
+            startPaddingLeft = mCardView.getPaddingLeft();
+            startPaddingRight = mCardView.getPaddingRight();
+            startPaddingTop = mCardView.getPaddingTop();
+            startPaddingBottom = mCardView.getPaddingBottom();
+
+            endPaddingLeft = endPaddingRight = endPaddingTop = endPaddingBottom = 0;
 
             startRadius = mCardView.getRadius();
             endRadius = 1f;// radius 减到 0 会自动产生透明度变化
@@ -221,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
             animator.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
+                    mCardStackView.setSkipLayout(true);
                     if (!reverse) {
                         mTitle.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
                         mToolbar.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
@@ -237,9 +254,16 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                         intent.putExtra("card", mCards.get(mIndex));
+                        intent.putExtra("padding", startPaddingBottom);
                         startActivityForResult(intent, REQ_DETAIL);
                         overridePendingTransition(0, 0);
                     }
+                    mCardStackView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCardStackView.setSkipLayout(false);
+                        }
+                    });
                 }
 
                 @Override
@@ -273,7 +297,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             update(0f);
-            //mImageView.postInvalidate();
             mTitle.setAlpha(1f);
             mToolbar.setAlpha(1f);
         }

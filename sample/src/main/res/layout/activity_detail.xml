@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="192dp"
         android:scaleType="centerCrop"
-        tools:src="@drawable/calendar"
+        tools:src="@drawable/knowledge"
         />
 
     <TextView

@@ -2,6 +2,7 @@ package me.brucezz.sample;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,7 +32,9 @@ public class DetailActivity extends AppCompatActivity {
         mContent = findViewById(R.id.detail_content);
 
         Card card = getIntent().getParcelableExtra("card");
-        mImageView.setImageResource(card.mImage);
+        int padding = getIntent().getIntExtra("padding", 0);
+        mImageView.getLayoutParams().height -= padding;
+        mImageView.setImageDrawable(ContextCompat.getDrawable(this, card.mImage));
         StatusBarUtil.setColor(this, card.mBgColor);
         mTextView.setText(card.mTitle);
 
@@ -45,7 +48,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        //setResult(RESULT_OK);
+        setResult(RESULT_OK);
         finish();
         overridePendingTransition(0, 0);
     }

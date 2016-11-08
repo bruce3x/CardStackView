@@ -26,4 +26,5 @@ dependencies {
     compile project(':cardstackview')
     compile 'com.android.support:cardview-v7:24.2.1'
     compile 'com.jaeger.statusbaruitl:library:1.3.0'
+    compile 'com.makeramen:roundedimageview:2.2.1'
 }
