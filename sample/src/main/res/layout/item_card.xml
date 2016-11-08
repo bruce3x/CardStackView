@@ -9,7 +9,6 @@
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
     app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true"
     tools:cardBackgroundColor="#2196F3">
 
     <ImageView

@@ -25,4 +25,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':cardstackview')
     compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.jaeger.statusbaruitl:library:1.3.0'
 }
