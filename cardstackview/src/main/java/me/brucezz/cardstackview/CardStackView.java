@@ -41,9 +41,14 @@ public class CardStackView extends ViewGroup {
     private CardHolder mSelected;
 
     private boolean mSkipLayout = false;
+    private boolean mSkipTouch = false;
 
     public void setSkipLayout(boolean skipLayout) {
         mSkipLayout = skipLayout;
+    }
+
+    public void setSkipTouch(boolean skipTouch) {
+        mSkipTouch = skipTouch;
     }
 
     public CardStackView(Context context) {
@@ -175,7 +180,6 @@ public class CardStackView extends ViewGroup {
 
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-
                 final CardHolder touch = mCardFactory.findByTouch(e.getY() - getPaddingTop());
                 if (touch != null && mOnCardClickListener != null) {
                     mOnCardClickListener.onClick(touch.mView, touch.mRealIndex, touch.mChildIndex);
@@ -213,6 +217,8 @@ public class CardStackView extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        if (mSkipTouch) return false;
 
         if (event.getAction() == MotionEvent.ACTION_UP && mSelected == null) {
             resetCardSpan();
