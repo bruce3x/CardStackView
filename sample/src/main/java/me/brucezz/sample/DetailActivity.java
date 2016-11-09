@@ -2,7 +2,6 @@ package me.brucezz.sample;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,11 +31,9 @@ public class DetailActivity extends AppCompatActivity {
         mContent = findViewById(R.id.detail_content);
 
         Card card = getIntent().getParcelableExtra("card");
-        int padding = getIntent().getIntExtra("padding", 0);
-        mImageView.getLayoutParams().height -= padding;
-        mImageView.setImageDrawable(ContextCompat.getDrawable(this, card.mImage));
+        mImageView.setImageResource(card.mImage);
         StatusBarUtil.setColor(this, card.mBgColor);
-        mTextView.setText(card.mTitle);
+        mTextView.setText("哈哈哈 改变一下标题 ~" + card.mTitle);
 
         animContent();
     }

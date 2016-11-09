@@ -5,8 +5,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -30,20 +28,7 @@ public class MainActivity extends AppCompatActivity {
     SimpleCardAdapter mCardAdapter;
     private List<Card> mCards;
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            modifyData();
-            mHandler.sendEmptyMessageDelayed(0, 2000);
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mHandler.removeMessages(0);
-    }
+    private AnimationHelper mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
         mCardStackView.setOnCardClickListener(new CardStackView.OnCardClickListener() {
             @Override
             public void onClick(View view, int realIndex, int initialIndex) {
-                //Toast.makeText(MainActivity.this, "点击了第" + realIndex + "个卡片 => " + mCards.get(initialIndex).mTitle,
-                //    Toast.LENGTH_SHORT).show();
-
                 toggleAnimation(view, initialIndex);
             }
         });
@@ -77,29 +59,12 @@ public class MainActivity extends AppCompatActivity {
         mCardAdapter = new SimpleCardAdapter(this, mCards);
 
         mCardStackView.setAdapter(mCardAdapter);
-
-        mToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recreate();
-            }
-        });
     }
 
     private List<Card> fakeCards() {
-
         return Arrays.asList(new Card(0xFF2196F3, R.drawable.post, "动态"), new Card(0xFF17B084, R.drawable.task, "任务"),
             new Card(0xFFE85D72, R.drawable.calendar, "日程"), new Card(0xFF00BACF, R.drawable.knowledge, "知识"));
     }
-
-    private void modifyData() {
-        for (int i = 0; i < mCards.size(); i++) {
-            mCards.get(i).mTitle += String.valueOf(i);
-        }
-        mCardAdapter.notifyDataSetChanged();
-    }
-
-    private AnimationHelper mHelper;
 
     private void toggleAnimation(final View view, final int index) {
         mHelper = new AnimationHelper(view, index);
@@ -118,110 +83,75 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void animOtherCards(int idx, boolean reverse) {
-        for (int i = 0; i < mCardStackView.getChildCount(); i++) {
-            if (i == idx) continue;
-
-            View view = mCardStackView.getChildAt(i);
-            if (reverse) {
-                view.animate().translationY(0f).setDuration(AnimationHelper.ANIMATION_DURATION_CARD).start();
-            } else {
-                int start = view.getTop();
-                int end = ((ViewGroup) view.getParent()).getBottom();
-                view.animate().translationY(end - start).setDuration(AnimationHelper.ANIMATION_DURATION_CARD).start();
-            }
-        }
-    }
-
     private class AnimationHelper {
 
-        public int mIndex;
+        private int mIndex;
 
-        public CardView mCardView;
-        public TextView mTitle;
-        public ImageView mImageView;
+        private CardView mCardView;
+        private ImageView mImageView;
+        private TextView mTitle;
+        private TextView mFoo;
 
-        public int startLeft;
-        public int endLeft;
-        public int startRight;
-        public int endRight;
-        public int startTop;
-        public int endTop;
-        public int startBottom;
-        public int endBottom;
+        private int startLeft, endLeft;
+        private int startRight, endRight;
+        private int startTop, endTop;
+        private int startBottom, endBottom;
 
-        public int startPaddingLeft;
-        public int endPaddingLeft;
-        public int startPaddingRight;
-        public int endPaddingRight;
-        public int startPaddingTop;
-        public int endPaddingTop;
-        public int startPaddingBottom;
-        public int endPaddingBottom;
+        private float startRadius, endRadius;
 
-        public float startRadius;
-        public float endRadius;
-
-        public @ColorInt int startColor;
-        public @ColorInt int endColor;
+        private @ColorInt int startColor, endColor;
         private ArgbEvaluator mArgbEvaluator = new ArgbEvaluator();
 
-        public static final long ANIMATION_DURATION_CARD = 500L;
-        public static final long ANIMATION_DURATION_ALPHA = 300L;
+        private float startElevation;
+        private float endElevation;
+
+        private static final long ANIMATION_DURATION_CARD = 500L;
+        private static final long ANIMATION_DURATION_ALPHA = 300L;
 
         public AnimationHelper(View view, int index) {
             mIndex = index;
             mCardView = ((CardView) view);
-            mTitle = (TextView) mCardView.findViewById(R.id.card_title);
             mImageView = (ImageView) mCardView.findViewById(R.id.card_image);
+            mTitle = (TextView) mCardView.findViewById(R.id.card_title);
+            mFoo = (TextView) mCardView.findViewById(R.id.card_foo);
 
             startLeft = mCardView.getLeft();
             startRight = mCardView.getRight();
             startTop = mCardView.getTop();
             startBottom = mCardView.getBottom();
 
-            endLeft = -mCardView.getPaddingLeft();
-            endRight = mCardView.getWidth() + 2 * mCardView.getLeft() + mCardView.getPaddingRight();
-            endTop = -mCardView.getPaddingTop();
-            endBottom = mCardView.getHeight() - mCardView.getPaddingTop();
-
-            startPaddingLeft = mCardView.getPaddingLeft();
-            startPaddingRight = mCardView.getPaddingRight();
-            startPaddingTop = mCardView.getPaddingTop();
-            startPaddingBottom = mCardView.getPaddingBottom();
-
-            endPaddingLeft = endPaddingRight = endPaddingTop = endPaddingBottom = 0;
+            endLeft = 0;
+            endRight = mCardView.getWidth() + 2 * mCardView.getLeft();
+            endTop = 0;
+            endBottom = mCardView.getHeight();
 
             startRadius = mCardView.getRadius();
             endRadius = 1f;// radius 减到 0 会自动产生透明度变化
 
             startColor = getResources().getColor(R.color.colorPrimaryDark);
             endColor = mCards.get(mIndex).mBgColor;
-        }
 
-        public int getLeft(float fraction) {
-            return (int) (startLeft + fraction * (endLeft - startLeft));
-        }
-
-        public int getRight(float fraction) {
-            return (int) (startRight + fraction * (endRight - startRight));
-        }
-
-        public int getTop(float fraction) {
-            return (int) (startTop + fraction * (endTop - startTop));
-        }
-
-        public int getBottom(float fraction) {
-            return (int) (startBottom + fraction * (endBottom - startBottom));
-        }
-
-        public float getRadius(float fraction) {
-            return startRadius + fraction * (endRadius - startRadius);
+            startElevation = mCardView.getMaxCardElevation();
+            endElevation = 0f;
         }
 
         @ColorInt
-        public int getColor(float fraction) {
+        private int getColor(float fraction) {
             return (int) mArgbEvaluator.evaluate(fraction, startColor, endColor);
+        }
+
+        private int getInterpolation(int start, int end, float fraction) {
+            return (int) (start + fraction * (end - start));
+        }
+
+        private int getInterpolation(float start, float end, float fraction) {
+            return (int) (start + fraction * (end - start));
+        }
+
+        private float getElevation(float start, float end, float fraction, float threshold) {
+            if (fraction <= threshold) return start;
+
+            return start + (end - start) * (fraction - threshold) / (1 - threshold);
         }
 
         public void startAnimation(final boolean reverse) {
@@ -238,9 +168,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationStart(Animator animation) {
                     mCardStackView.setSkipLayout(true);
+                    mCardStackView.setSkipTouch(true);
                     if (!reverse) {
-                        mTitle.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
                         mToolbar.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
+                        mTitle.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
+                        mFoo.animate().alpha(0f).setDuration(ANIMATION_DURATION_ALPHA).start();
                     }
 
                     animOtherCards(mIndex, reverse);
@@ -249,12 +181,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     if (reverse) {
-                        mTitle.animate().alpha(1f).setDuration(ANIMATION_DURATION_ALPHA).start();
                         mToolbar.animate().alpha(1f).setDuration(ANIMATION_DURATION_ALPHA).start();
+                        mTitle.animate().alpha(1f).setDuration(ANIMATION_DURATION_ALPHA).start();
+                        mFoo.animate().alpha(1f).setDuration(ANIMATION_DURATION_ALPHA).start();
                     } else {
                         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                         intent.putExtra("card", mCards.get(mIndex));
-                        intent.putExtra("padding", startPaddingBottom);
                         startActivityForResult(intent, REQ_DETAIL);
                         overridePendingTransition(0, 0);
                     }
@@ -262,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mCardStackView.setSkipLayout(false);
+                            mCardStackView.setSkipTouch(false);
                         }
                     });
                 }
@@ -280,9 +213,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void update(float fraction) {
-            mCardView.setRadius(getRadius(fraction));
-            mCardView.getLayoutParams().width = getRight(fraction) - getLeft(fraction);
-            mCardView.layout(getLeft(fraction), getTop(fraction), getRight(fraction), getBottom(fraction));
+            mCardView.setRadius(getInterpolation(startRadius, endRadius, fraction));
+            int right = getInterpolation(startRight, endRight, fraction);
+            int left = getInterpolation(startLeft, endLeft, fraction);
+            int top = getInterpolation(startTop, endTop, fraction);
+            int bottom = getInterpolation(startBottom, endBottom, fraction);
+            mCardView.getLayoutParams().width = right - left;
+            mCardView.layout(left, top, right, bottom);
+
+            /**
+             * 设置了一个阈值 threshold， 进度超过阈值之后才开始进行插值。
+             * 也就是等到其他卡片都收起来之后，再对当前卡片做阴影动画，避免在 5.x 绘制层级问题。
+             *
+             * 最终阴影变为0，避免了在 4.x 上 CardView 自带边距绘制阴影，导致无法无缝切换的问题。
+             */
+            float elevation =
+                getElevation(startElevation, endElevation, fraction, ANIMATION_DURATION_ALPHA * 1f / ANIMATION_DURATION_CARD);
+            mCardView.setMaxCardElevation(elevation);
+            mCardView.setCardElevation(elevation);
+
             mCardView.requestLayout();
             StatusBarUtil.setColor(MainActivity.this, getColor(fraction));
         }
@@ -298,7 +247,26 @@ public class MainActivity extends AppCompatActivity {
 
             update(0f);
             mTitle.setAlpha(1f);
+            mFoo.setAlpha(1f);
             mToolbar.setAlpha(1f);
+        }
+
+        /**
+         * 其他卡片直接进行简单的 translation 动画沿 Y 轴移动即可
+         */
+        private void animOtherCards(int idx, boolean reverse) {
+            for (int i = 0; i < mCardStackView.getChildCount(); i++) {
+                if (i == idx) continue;
+
+                View view = mCardStackView.getChildAt(i);
+                if (reverse) {
+                    view.animate().translationY(0f).setDuration(AnimationHelper.ANIMATION_DURATION_CARD).start();
+                } else {
+                    int start = view.getTop();
+                    int end = ((ViewGroup) view.getParent()).getBottom();
+                    view.animate().translationY(end - start).setDuration(AnimationHelper.ANIMATION_DURATION_CARD).start();
+                }
+            }
         }
     }
 }
