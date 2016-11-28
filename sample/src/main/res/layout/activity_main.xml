@@ -14,7 +14,9 @@
         android:paddingBottom="@dimen/card_height"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="64dp"/>
+        android:paddingTop="64dp"
+        app:card_height="@dimen/card_height"
+        app:card_min_span="@dimen/card_span_min"/>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

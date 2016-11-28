@@ -62,16 +62,6 @@ public class SimpleCardAdapter extends CardAdapter {
     }
 
     @Override
-    public int getCardHeight() {
-        return mContext.getResources().getDimensionPixelSize(R.dimen.card_height);
-    }
-
-    @Override
-    public int getMinCardSpan() {
-        return mContext.getResources().getDimensionPixelSize(R.dimen.card_span_min);
-    }
-
-    @Override
     public int getOrder(int position) {
         return mCards.get(position).first;
     }

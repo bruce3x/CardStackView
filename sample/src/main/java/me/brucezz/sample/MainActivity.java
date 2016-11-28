@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             startRadius = mCardView.getRadius();
             endRadius = 1f;// radius 减到 0 会自动产生透明度变化
 
-            startColor = getResources().getColor(R.color.colorPrimaryDark);
+            startColor = getResources().getColor(R.color.colorPrimary);
             endColor = mCards.get(mIndex).second.mBgColor;
 
             startElevation = mCardView.getMaxCardElevation();

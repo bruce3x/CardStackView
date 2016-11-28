@@ -23,16 +23,6 @@ public abstract class CardAdapter {
     public abstract int getItemCount();
 
     /**
-     * 获取每一个 View 的高度
-     */
-    public abstract int getCardHeight();
-
-    /**
-     * View 最小间隔
-     */
-    public abstract int getMinCardSpan();
-
-    /**
      * 获取卡片的排序位置
      * 如 原始第 1 张卡片，现在要摆放在第 3 的位置
      * 则 getOrder(1) return 3;

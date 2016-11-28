@@ -2,6 +2,7 @@ package me.brucezz.cardstackview;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.ViewDragHelper;
@@ -42,6 +43,8 @@ public class CardStackView extends ViewGroup {
 
     private boolean mSkipLayout = false;
     private boolean mSkipTouch = false;
+    private int mCardHeight;
+    private int mCardMinSpan;
 
     public void setSkipLayout(boolean skipLayout) {
         mSkipLayout = skipLayout;
@@ -61,6 +64,11 @@ public class CardStackView extends ViewGroup {
 
     public CardStackView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        TypedArray ta = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.CardStackView, defStyleAttr, 0);
+        mCardHeight = ta.getDimensionPixelSize(R.styleable.CardStackView_card_height, Util.dp2px(getContext(), 160));
+        mCardMinSpan = ta.getDimensionPixelSize(R.styleable.CardStackView_card_min_span, Util.dp2px(getContext(), 40));
+        ta.recycle();
 
         initTouchCallback();
 
@@ -195,11 +203,10 @@ public class CardStackView extends ViewGroup {
         int parentH = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
         int parentW = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
 
-        // TODO: 2016/10/31 后面提供相关属性，不通过 adapter 提供
-        mOptions.CARD_HEIGHT = mCardAdapter.getCardHeight();
+        mOptions.CARD_HEIGHT = mCardHeight;
         mOptions.CARD_WIDTH = parentW;
 
-        mOptions.CARD_SPAN_NORMAL_MIN = mCardAdapter.getMinCardSpan();
+        mOptions.CARD_SPAN_NORMAL_MIN = mCardMinSpan;
         int span = (parentH - mOptions.CARD_HEIGHT) / (mCardAdapter.getItemCount() - 1);
         mOptions.CARD_SPAN_NORMAL = Math.max(span, mOptions.CARD_SPAN_NORMAL_MIN);
 

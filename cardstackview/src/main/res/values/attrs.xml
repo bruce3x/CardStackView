@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CardStackView">
+        <attr format="dimension" name="card_height"/>
+        <attr format="dimension" name="card_min_span"/>
+    </declare-styleable>
+</resources>
