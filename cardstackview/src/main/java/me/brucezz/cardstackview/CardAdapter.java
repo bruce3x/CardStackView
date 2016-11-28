@@ -32,6 +32,16 @@ public abstract class CardAdapter {
      */
     public abstract int getMinCardSpan();
 
+    /**
+     * 获取卡片的排序位置
+     * 如 原始第 1 张卡片，现在要摆放在第 3 的位置
+     * 则 getOrder(1) return 3;
+     *
+     * @param position 原始卡片的位置
+     * @return 当前排序所处的位置
+     */
+    public abstract int getOrder(int position);
+
     private final DataSetObservable mObservable = new DataSetObservable();
 
     public final void notifyDataSetChanged() {

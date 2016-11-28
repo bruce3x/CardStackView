@@ -70,17 +70,17 @@ public class CardStackView extends ViewGroup {
 
     private void initViews() {
         mOptions = new Options();
+        mCardFactory = new CardFactory(this, mOptions, mCardAdapter.getItemCount());
 
         for (int i = 0; i < mCardAdapter.getItemCount(); i++) {
-            addView(mCardAdapter.getView(null, i, this));
+            View child = mCardAdapter.getView(null, i, this);
+            this.addView(child);
+            mCardFactory.add(mCardAdapter.getOrder(i), i, child);
         }
 
         mSlidingResistanceCalculator = new SlidingResistanceCalculator(2000f, mOptions.CARD_SPAN_OFFSET);
 
         updateOptions();
-
-        mCardFactory = new CardFactory(this, mOptions);
-        //Log.d(TAG, "init: " + mCardAdapter.getItemCount());
     }
 
     private void initTouchCallback() {
@@ -121,8 +121,6 @@ public class CardStackView extends ViewGroup {
             @Override
             public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
                 if (changedView != mSelected.mView) return;
-
-                //Log.d(TAG, String.format("onViewPositionChanged: left=%d, top=%d, dx=%d, dy=%d", left, top, dx, dy));
 
                 CardHolder holder = mCardFactory.findByView(changedView);
                 if (holder == null) return;
@@ -344,6 +342,10 @@ public class CardStackView extends ViewGroup {
     }
 
     public interface OnPositionChangedListener {
+        /**
+         * @param position 原始卡片对应当前排序的位置
+         *                 如原始第 1 张卡片现在排在第 3 个，则 position.get(1) = 3
+         */
         void onPositionChanged(List<Integer> position);
     }
 

@@ -8,11 +8,11 @@ import android.animation.Animator;
  * Email: im.brucezz@gmail.com
  */
 
-public class AnimatorListenerImpl implements Animator.AnimatorListener {
+public class AnimationCancelListener implements Animator.AnimatorListener {
     private CardHolder mRunning;
     private CardHolder mDragging;
 
-    public AnimatorListenerImpl(CardHolder running, CardHolder dragging) {
+    public AnimationCancelListener(CardHolder running, CardHolder dragging) {
         mRunning = running;
         mDragging = dragging;
     }

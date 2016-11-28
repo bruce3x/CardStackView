@@ -2,6 +2,7 @@ package me.brucezz.sample;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,16 +21,16 @@ import me.brucezz.cardstackview.CardAdapter;
 public class SimpleCardAdapter extends CardAdapter {
 
     private Context mContext;
-    private List<Card> mCards;
+    private List<Pair<Integer, Card>> mCards;
 
-    public SimpleCardAdapter(Context context, List<Card> cards) {
+    public SimpleCardAdapter(Context context, List<Pair<Integer, Card>> cards) {
         mContext = context;
         mCards = cards;
     }
 
     @Override
     public View getView(View oldView, int position, ViewGroup parent) {
-        Card card = mCards.get(position);
+        Card card = mCards.get(position).second;
 
         ViewHolder holder;
         View view;
@@ -68,6 +69,11 @@ public class SimpleCardAdapter extends CardAdapter {
     @Override
     public int getMinCardSpan() {
         return mContext.getResources().getDimensionPixelSize(R.dimen.card_span_min);
+    }
+
+    @Override
+    public int getOrder(int position) {
+        return mCards.get(position).first;
     }
 
     private static class ViewHolder {

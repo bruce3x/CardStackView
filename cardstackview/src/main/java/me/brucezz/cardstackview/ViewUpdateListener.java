@@ -8,13 +8,13 @@ import android.animation.ValueAnimator;
  * Email: im.brucezz@gmail.com
  */
 
-public class AnimatorUpdateListenerImpl implements ValueAnimator.AnimatorUpdateListener {
+public class ViewUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
     private CardHolder mRunning;
     private CardHolder mDragging;
     private int mStart, mMid, mEnd;
 
-    public AnimatorUpdateListenerImpl(CardHolder running, CardHolder dragging, int start, int mid, int end) {
+    public ViewUpdateListener(CardHolder running, CardHolder dragging, int start, int mid, int end) {
         mRunning = running;
         mDragging = dragging;
         mStart = start;

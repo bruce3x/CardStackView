@@ -4,12 +4,15 @@ import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,9 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
     CardStackView mCardStackView;
     SimpleCardAdapter mCardAdapter;
-    private List<Card> mCards;
+    private List<Pair<Integer, Card>> mCards;
 
     private AnimationHelper mHelper;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +55,40 @@ public class MainActivity extends AppCompatActivity {
                 for (Integer integer : position) {
                     sb.append(integer).append(" ");
                 }
-                Log.d("TAG", "onPositionChanged: " + sb.toString());
+                mPreferences.edit().putString("order", sb.toString()).apply();
             }
         });
 
-        mCards = fakeCards();
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        String order = mPreferences.getString("order", "");
+        int[] orders;
+        if (TextUtils.isEmpty(order)) {
+            orders = new int[] { 0, 1, 2, 3 };
+        } else {
+            String[] ordersArr = order.trim().split(" ");
+            orders = new int[ordersArr.length];
+            for (int i = 0; i < ordersArr.length; i++) {
+                orders[i] = Integer.valueOf(ordersArr[i]);
+            }
+        }
+        mCards = initCards(orders);
         mCardAdapter = new SimpleCardAdapter(this, mCards);
 
         mCardStackView.setAdapter(mCardAdapter);
+
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println(mPreferences.getString("order", ""));
+            }
+        });
     }
 
-    private List<Card> fakeCards() {
-        return Arrays.asList(new Card(0xFF2196F3, R.drawable.post, "动态"), new Card(0xFF17B084, R.drawable.task, "任务"),
-            new Card(0xFFE85D72, R.drawable.calendar, "日程"), new Card(0xFF00BACF, R.drawable.knowledge, "知识"));
+    private List<Pair<Integer, Card>> initCards(int... orders) {
+        return Arrays.asList(Pair.create(orders[0], new Card(0xFF00BACF, R.drawable.knowledge, "知识")),
+            Pair.create(orders[1], new Card(0xFFE85D72, R.drawable.calendar, "日程")),
+            Pair.create(orders[2], new Card(0xFF17B084, R.drawable.task, "任务")),
+            Pair.create(orders[3], new Card(0xFF2196F3, R.drawable.post, "动态")));
     }
 
     private void toggleAnimation(final View view, final int index) {
@@ -129,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             endRadius = 1f;// radius 减到 0 会自动产生透明度变化
 
             startColor = getResources().getColor(R.color.colorPrimaryDark);
-            endColor = mCards.get(mIndex).mBgColor;
+            endColor = mCards.get(mIndex).second.mBgColor;
 
             startElevation = mCardView.getMaxCardElevation();
             endElevation = 0f;
@@ -186,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                         mFoo.animate().alpha(1f).setDuration(ANIMATION_DURATION_ALPHA).start();
                     } else {
                         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                        intent.putExtra("card", mCards.get(mIndex));
+                        intent.putExtra("card", mCards.get(mIndex).second);
                         startActivityForResult(intent, REQ_DETAIL);
                         overridePendingTransition(0, 0);
                     }

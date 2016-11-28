@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,12 +18,21 @@ public class CardFactory {
     private ArrayList<CardHolder> mCardHolders = new ArrayList<>();
 
     private Options mOptions;
+    private ViewGroup mParent;
 
-    public CardFactory(ViewGroup parent, Options options) {
+    public CardFactory(ViewGroup parent, Options options, int count) {
+        mParent = parent;
         mOptions = options;
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            mCardHolders.add(new CardHolder(parent, parent.getChildAt(i), i, mOptions));
+        for (int i = 0; i < count; i++) {
+            mCardHolders.add(null);// 添加 null 占位
         }
+    }
+
+    public void add(int orderIndex, int childIndex, View child) {
+        if (mCardHolders.size() > orderIndex && mCardHolders.get(orderIndex) != null) {
+            throw new IllegalArgumentException("You have put a card to order #%d" + orderIndex);
+        }
+        mCardHolders.set(orderIndex, new CardHolder(mParent, child, childIndex, orderIndex, mOptions));
     }
 
     public int size() {
@@ -84,11 +94,12 @@ public class CardFactory {
     }
 
     public List<Integer> getAllPosition() {
-        List<Integer> all = new ArrayList<>();
-        for (CardHolder holder : mCardHolders) {
-            all.add(holder.mChildIndex);
+        Integer[] orders = new Integer[mCardHolders.size()];
+        for (int i = 0; i < mCardHolders.size(); i++) {
+            int childIndex = mCardHolders.get(i).mChildIndex;
+            orders[childIndex] = i;
         }
 
-        return all;
+        return Arrays.asList(orders);
     }
 }
